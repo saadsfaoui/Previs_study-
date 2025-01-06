@@ -42,7 +42,8 @@ const UserPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 pt-20">
       <AdminHeader />
-      <main className="container mx-auto px-6">
+      <main>
+      <div className="container mx-auto px-6">
         <h1 className="text-2xl font-bold mb-4">User Information</h1>
         {/* Graphique en cercle */}
         <div className="flex justify-center mb-6">
@@ -56,6 +57,8 @@ const UserPage = () => {
           </div>
         </div>
         {/* Tableau des utilisateurs */}
+        <div className="bg-white shadow-lg p-6 rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Existing Groups</h2>
         <table className="w-full border-collapse bg-white shadow rounded-lg">
           <thead>
             <tr>
@@ -83,6 +86,8 @@ const UserPage = () => {
             </tr>
           </tbody>
         </table>
+        </div>
+        </div>
       </main>
     </div>
   );
