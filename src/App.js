@@ -11,6 +11,7 @@ import DashboardPage from './pages/Student/DashboardPage';
 import SubjectsPage from './pages/Student/SubjectsPage';
 import PredictionsPage from './pages/Student/PredictionsPage';
 import GroupsPage from './pages/Student/GroupsPage';
+import './index.css';
 
 const App = () => {
   return (

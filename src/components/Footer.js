@@ -3,25 +3,9 @@ import React from 'react';
 const Footer = () => {
   return (
     <footer className="bg-gray-800 py-10 px-6 text-white">
-      <div className="container mx-auto">
+      <div className=" mx-auto">
         {/* Logo and Newsletter */}
-        <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold">Innovative Platform</h1>
-          <p className="mt-2 text-gray-300">Subscribe to our newsletter</p>
-          <form className="mt-4 flex justify-center">
-            <input
-              type="email"
-              placeholder="Your email"
-              className="px-4 py-2 border border-gray-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
+       
 
         {/* Contact Form */}
         <div id="contact" className="text-center mb-10">
