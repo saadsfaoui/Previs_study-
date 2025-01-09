@@ -1,45 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { PieChart, Pie, Cell, Legend, LineChart, Line } from 'recharts';
-import './PredictionsPage.css'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, LineChart, Line } from 'recharts';
+import API from '../../services/api';
+import './PredictionsPage.css';
+
 const PredictionsPage = () => {
-  // Données pour Quarterly Performance (Graphique en barres)
-  const quarterlyData = [
-    { name: 'Q1', Math: 40, Science: 30, English: 20 },
-    { name: 'Q2', Math: 35, Science: 25, English: 30 },
-    { name: 'Q3', Math: 50, Science: 40, English: 35 },
-    { name: 'Q4', Math: 45, Science: 35, English: 40 },
-  ];
+  const [quarterlyData, setQuarterlyData] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
 
-  // Données pour le graphique circulaire (Contact Rate Analysis)
-  const pieData = [
-    { name: 'Contact Rate', value: 70 },
-    { name: 'Other', value: 30 },
-  ];
+  useEffect(() => {
+    const fetchPredictions = async () => {
+      try {
+        // Appels API pour récupérer les données
+        const userPredictionsResponse = await API.get('/predictions/user');
+        const monthlyOverviewResponse = await API.get('/predictions/overview');
 
-  // Données pour Engagement Stats (Graphique circulaire)
-  const engagementData = [
-    { name: 'Opens', value: 60 },
-    { name: 'Contacts', value: 40 },
-  ];
+        const userPredictions = userPredictionsResponse.data;
+        const monthlyPredictions = monthlyOverviewResponse.data;
 
-  // Données pour Clicks Trend (Graphique en ligne)
-  const clicksData = [
-    { month: 'Jan', clicks: 400 },
-    { month: 'Feb', clicks: 500 },
-    { month: 'Mar', clicks: 600 },
-    { month: 'Apr', clicks: 700 },
-    { month: 'May', clicks: 600 },
-    { month: 'Jun', clicks: 400 },
-  ];
+        // Transformation des données pour le BarChart (Quarterly Performance)
+        const subjects = Array.from(new Set(userPredictions.map((pred) => pred.subject)));
+        const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+        const transformedQuarterlyData = quarters.map((quarter) => {
+          const quarterData = { name: quarter };
+          subjects.forEach((subject) => {
+            const prediction = userPredictions.find(
+              (pred) => pred.quarter === quarter && pred.subject === subject
+            );
+            quarterData[subject] = prediction ? Number(prediction.predicted_score) : 0;
+          });
+          return quarterData;
+        });
+
+        // Transformation des données pour le LineChart (Monthly Performance)
+        const transformedMonthlyData = monthlyPredictions
+          .filter((item) => item.average_score !== null && !isNaN(item.average_score)) // Filtrer les valeurs invalides
+          .map((item) => ({
+            month: item.month, // Format YYYY-MM
+            average_score: Number(item.average_score) || 0, // Assurez-vous que la valeur est un nombre
+          }));
+
+        setQuarterlyData(transformedQuarterlyData);
+        setMonthlyData(transformedMonthlyData);
+      } catch (err) {
+        console.error('Erreur lors du chargement des données:', err);
+      }
+    };
+
+    fetchPredictions();
+  }, []);
 
   return (
     <div>
       <Header />
       <main className="container">
-       
-
         {/* Quarterly Performance */}
         <section className="quarterly-performance">
           <h2>Quarterly Performance</h2>
@@ -47,36 +62,34 @@ const PredictionsPage = () => {
             <BarChart data={quarterlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis />
+              <YAxis domain={[0, 100]} />
               <Tooltip />
-              <Bar dataKey="Math" fill="#8884d8" />
-              <Bar dataKey="Science" fill="#82ca9d" />
-              <Bar dataKey="English" fill="#ffc658" />
+              {quarterlyData.length > 0 &&
+                Object.keys(quarterlyData[0])
+                  .filter((key) => key !== 'name')
+                  .map((key, index) => (
+                    <Bar
+                      key={index}
+                      dataKey={key}
+                      fill={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
+                    />
+                  ))}
             </BarChart>
           </ResponsiveContainer>
         </section>
 
-        
-
-        {/* Performance Preferences */}
+        {/* Performance Overview (Monthly Data) */}
         <section className="performance-preferences">
-          <h2>Performance Preferences</h2>
-          <div className="charts-container">
-            
-            {/* Clicks Trend */}
-            <ResponsiveContainer width="50%" height={300}>
-              <LineChart data={clicksData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="clicks" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-
-        
-            
-          </div>
+          <h2>Performance Overview (Monthly)</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" /> {/* Affiche le mois (YYYY-MM) */}
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Line type="monotone" dataKey="average_score" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
         </section>
       </main>
     </div>
@@ -84,4 +97,3 @@ const PredictionsPage = () => {
 };
 
 export default PredictionsPage;
-

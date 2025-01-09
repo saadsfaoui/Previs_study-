@@ -1,35 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
+import API from '../../services/api';
 import './GroupsPage.css';
-import image1 from '../../images/image1.png';
-import image2 from '../../images/image2.jpg';
-import image3 from '../../images/image3.jpg';
 
 const GroupsPage = () => {
-  // Données simulées pour les groupes
-  const groups = [
-    { name: 'Book Lovers', status: 'Member', joined: 'Jan 2023' },
-    { name: 'Tech Innovators', status: 'Admin', joined: 'Mar 2022' },
-  ];
-
-  const recommendedGroups = [
-    { name: 'Photography Club', description: 'Join fellow enthusiasts in exploring the art of photography.' },
-    { name: 'Book Lovers Group', description: 'Dive into discussions about your favorite books and authors.' },
-  ];
-
-  const sharedResources = [
-    { title: 'Group A', description: 'Access shared documents and presentations.', image: image1 },
-    { title: 'Study Team', description: 'Browse through study materials and notes.', image: image2 },
-    { title: 'Project X', description: 'Find resources for the upcoming project.', image: image3 },
-  ];
-
-  // État pour le terme de recherche
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredGroups, setFilteredGroups] = useState(groups);
+  const [allGroups, setAllGroups] = useState([]);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [recommendedGroups, setRecommendedGroups] = useState([]);
+  const [sharedResources, setSharedResources] = useState([]);
+
+  // Charger les données pour les groupes et les ressources
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        // Lister tous les groupes
+        const allGroupsResponse = await API.get('/groups/search');
+        setAllGroups(allGroupsResponse.data);
+        setFilteredGroups(allGroupsResponse.data);
+
+        // Lister les groupes recommandés
+        const recommendedGroupsResponse = await API.get('/groups/recommended');
+        setRecommendedGroups(recommendedGroupsResponse.data);
+
+        // Lister les ressources partagées
+        const sharedResourcesResponse = await API.get('/groups/resources');
+        setSharedResources(sharedResourcesResponse.data);
+      } catch (err) {
+        console.error('Erreur lors du chargement des groupes et des ressources:', err);
+      }
+    };
+
+    fetchGroups();
+  }, []);
 
   // Fonction de recherche
   const handleSearch = () => {
-    const filtered = groups.filter(group =>
+    const filtered = allGroups.filter((group) =>
       group.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredGroups(filtered);
@@ -39,28 +46,30 @@ const GroupsPage = () => {
     <div>
       <Header />
       <main className="container">
-        <h1>Join a Group</h1>
+        <h1>Groups</h1>
+
+        {/* Recherche des groupes */}
         <div className="join-group">
           <input
             type="text"
-            placeholder="Enter group name"
+            placeholder="Search for a group"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button className="btn join" onClick={handleSearch}>
-            Search a Group
+            Search
           </button>
         </div>
 
+        {/* Lister tous les groupes */}
         <section className="groups">
-          <h2>Groups</h2>
+          <h2>All Groups</h2>
           <div className="group-list">
             {filteredGroups.length > 0 ? (
               filteredGroups.map((group, index) => (
                 <div key={index} className="group-card">
                   <h3>{group.name}</h3>
-                  <p>Status: {group.status}</p>
-                  <p>Joined: {group.joined}</p>
+                  <p>{group.description}</p>
                 </div>
               ))
             ) : (
@@ -69,6 +78,7 @@ const GroupsPage = () => {
           </div>
         </section>
 
+        {/* Lister les groupes recommandés */}
         <section className="recommended-groups">
           <h2>Recommended Groups</h2>
           <div className="group-list">
@@ -82,12 +92,12 @@ const GroupsPage = () => {
           </div>
         </section>
 
+        {/* Lister les ressources partagées */}
         <section className="shared-resources">
           <h2>Shared Resources</h2>
           <div className="resource-list">
             {sharedResources.map((resource, index) => (
               <div key={index} className="resource-card">
-                <img src={resource.image} alt={resource.title} />
                 <h3>{resource.title}</h3>
                 <p>{resource.description}</p>
               </div>

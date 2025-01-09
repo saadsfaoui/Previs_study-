@@ -1,41 +1,57 @@
 .container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 1rem;
-  }
-  
-  .quarterly-performance {
-    margin-bottom: 2rem;
-  }
-  
-  .monthly-goals {
-    margin-bottom: 2rem;
-  }
-  
-  .goals-container {
-    display: flex;
-    gap: 2rem;
-  }
-  
-  .goal-card {
-    flex: 1;
-    background: #f5f5f5;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .performance-preferences {
-    margin-top: 2rem;
-  }
-  
-  .charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-  
-  .charts-container > * {
-    flex: 1 1 calc(50% - 2rem);
-  }
-  
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.quarterly-performance {
+  margin-bottom: 2rem;
+}
+
+.monthly-goals {
+  margin-bottom: 2rem;
+}
+
+.goals-container {
+  display: flex;
+  gap: 2rem;
+}
+
+.goal-card {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.performance-preferences {
+  margin-top: 2rem;
+}
+
+.charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.charts-container > * {
+  flex: 1 1 calc(50% - 2rem);
+}
+
+.container {
+  margin: 20px auto;
+  max-width: 1200px;
+}
+
+.quarterly-performance,
+.performance-preferences {
+  margin-bottom: 40px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}

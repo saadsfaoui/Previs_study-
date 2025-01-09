@@ -1,12 +1,27 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import API from '../services/api'; // Importez votre instance Axios
 
 const AdminHeader = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // Hook pour la redirection
 
-  const handleLogout = () => {
-    // Ajoutez ici votre logique de déconnexion, comme la suppression des tokens
-    alert('You have been logged out.');
+  const handleLogout = async () => {
+    try {
+      // Appel API pour effectuer le logout
+      await API.post('/auth/logout'); // Assurez-vous que votre backend a une route POST /logout
+
+      // Suppression des données locales (par exemple, token d'authentification)
+      localStorage.removeItem('authToken');
+
+      alert('You have been logged out.');
+
+      // Redirection vers la Landing Page
+      navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      alert('Failed to log out. Please try again.');
+    }
   };
 
   return (
@@ -20,31 +35,6 @@ const AdminHeader = () => {
             className="h-10 w-10 rounded-full border-2 border-gray-300"
           />
           <h1 className="text-xl font-bold">Admin Panel</h1>
-        </div>
-
-        {/* Barre de recherche */}
-        <div className="relative flex-1 mx-6">
-          <input
-            type="text"
-            placeholder="Search ..."
-            className="w-full py-2 pl-10 pr-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          />
-          <div className="absolute top-1/2 left-3 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
         </div>
 
         {/* Navigation */}

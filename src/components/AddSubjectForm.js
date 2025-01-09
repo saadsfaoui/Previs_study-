@@ -1,24 +1,32 @@
 import React, { useState } from "react";
+import API from "../services/api";
 
-const AddSubjectForm = ({ subjects, setSubjects }) => {
+const AddSubjectForm = ({ refreshSubjects }) => {
   const [subjectName, setSubjectName] = useState("");
   const [score, setScore] = useState("");
   const [date, setDate] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ajouter une nouvelle entrée dans le tableau des matières
-    const newSubject = {
-      name: subjectName,
-      score: parseInt(score), // Convertir le score en nombre
-      date,
-    };
+    try {
+      // Appel API pour ajouter un nouveau sujet
+      await API.post("/subjects", {
+        name: subjectName,
+        score: parseInt(score, 10), // Convertir en nombre
+        date,
+      });
 
-    setSubjects([...subjects, newSubject]); // Mettre à jour la liste des matières
-    setSubjectName(""); // Réinitialiser les champs du formulaire
-    setScore("");
-    setDate("");
+      // Réinitialiser les champs du formulaire
+      setSubjectName("");
+      setScore("");
+      setDate("");
+
+      // Rafraîchir la liste des sujets
+      refreshSubjects();
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du sujet :", error.response?.data || error.message);
+    }
   };
 
   return (
@@ -52,4 +60,3 @@ const AddSubjectForm = ({ subjects, setSubjects }) => {
 };
 
 export default AddSubjectForm;
-

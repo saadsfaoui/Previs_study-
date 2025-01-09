@@ -1,78 +1,132 @@
-/*import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import styles from './DashboardPage.css';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
+import API from '../../services/api';
+import './DashboardPage.css';
 
 const DashboardPage = () => {
-  // Données pour le graphique en secteurs
-  const performanceData = [
-    { name: 'Math', value: 400 },
-    { name: 'Science', value: 300 },
-    { name: 'English', value: 200 },
-    { name: 'History', value: 100 },
-  ];
+  const [subjectsProportion, setSubjectsProportion] = useState([]);
+  const [performanceData, setPerformanceData] = useState([]);
+  const [averageScore, setAverageScore] = useState(null);
 
-  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#d84a88'];
+  const transformPerformanceData = (performanceOverTime) => {
+    const groupedData = {};
 
-  // Données pour le graphique en barres
-  const trendData = [
-    { name: 'Jan', Predicted: 85, Actual: 75 },
-    { name: 'Feb', Predicted: 90, Actual: 80 },
-    { name: 'Mar', Predicted: 95, Actual: 85 },
-    { name: 'Apr', Predicted: 87, Actual: 70 },
-    { name: 'May', Predicted: 88, Actual: 72 },
-  ];
+    performanceOverTime.forEach((item) => {
+      if (!groupedData[item.date]) {
+        groupedData[item.date] = { date: item.date, scores: [] };
+      }
+      groupedData[item.date].scores.push(item.score);
+    });
+
+    return Object.values(groupedData).map((group) => ({
+      date: group.date,
+      average_score:
+        group.scores.reduce((a, b) => a + b, 0) / group.scores.length,
+    }));
+  };
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await API.get('/dashboard');
+        const { overall_performance, subjects_proportion } = response.data;
+
+        const performanceData = transformPerformanceData(
+          overall_performance.performance_over_time
+        );
+
+        setSubjectsProportion(
+          subjects_proportion.map((subject) => ({
+            name: subject.name,
+            average_score: Number(subject.average_score),
+          }))
+        );
+        setPerformanceData(performanceData);
+        setAverageScore(overall_performance.average_score || null);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données du tableau de bord :', error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div>
       <Header />
-      <main className={styles.container}>
-        <section className={styles.performance}>
-          <div className={styles.chartContainer}>
-            <h2>Student Performance</h2>
+      <main className="container">
+        {/* Pie Chart : Moyenne des scores par matière */}
+        <section className="dashboard-section">
+          <div className="performance-scores">
+            <h2>Subjects Proportion</h2>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={performanceData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  label
-                >
-                  {performanceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend />
-              </PieChart>
+              {subjectsProportion.length > 0 ? (
+                <PieChart>
+                  <Pie
+                    data={subjectsProportion}
+                    dataKey="average_score"
+                    nameKey="name"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label={({ name, percent }) =>
+                      `${name} (${(percent * 100).toFixed(0)}%)`
+                    }
+                  >
+                    {subjectsProportion.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={`#${Math.floor(Math.random() * 16777215).toString(
+                          16
+                        )}`}
+                      />
+                    ))}
+                  </Pie>
+                  <Legend />
+                </PieChart>
+              ) : (
+                <p>No data available for Subjects Proportion.</p>
+              )}
             </ResponsiveContainer>
           </div>
 
-          <div className={styles.suggestions}>
-            <h2>Personalized Suggestions</h2>
-            <div className={styles.card}>
-              <h3>Math Score</h3>
-              <p className={styles.score}>85</p>
-              <p className={styles.percentage}>▲ 85%</p>
-            </div>
+          <div className="average-score">
+            <h3>Average Score</h3>
+            <p>
+              {averageScore !== null
+                ? Number(averageScore).toFixed(2)
+                : 'N/A'}
+            </p>
           </div>
         </section>
 
-        <section className={styles.trends}>
+        {/* Line Chart : Tendance des performances */}
+        <section className="performance-trends">
           <h2>Performance Trend Analysis</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+            <LineChart data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="Predicted" fill="#8884d8" />
-              <Bar dataKey="Actual" fill="#82ca9d" />
-            </BarChart>
+              <Line
+                type="monotone"
+                dataKey="average_score"
+                stroke="#8884d8"
+              />
+            </LineChart>
           </ResponsiveContainer>
         </section>
       </main>
@@ -80,92 +134,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;*/
-
-import React from 'react';
-import Header from '../../components/Header';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line } from 'recharts';
-import './DashboardPage.css'
-
-const DashboardPage = () => {
-  // Données pour le graphique en anneau
-  const performanceData = [
-    { name: 'Math', value: 25, color: '#4CAF50' },
-    { name: 'Science', value: 20, color: '#FF5722' },
-    { name: 'English', value: 30, color: '#3F51B5' },
-    { name: 'History', value: 25, color: '#E91E63' },
-  ];
-
-  // Données pour le graphique en barres
-  const clicksData = [
-    { month: 'Jan', clicks: 400 },
-    { month: 'Feb', clicks: 500 },
-    { month: 'Mar', clicks: 600 },
-    { month: 'Apr', clicks: 700 },
-    { month: 'May', clicks: 600 },
-    { month: 'Jun', clicks: 400 },
-  ];
-
-  return (
-    <div>
-      <Header />
-      <main className="container">
-        
-
-        <section className="dashboard-section">
-          {/* Performance Scores */}
-          <div className="performance-scores">
-            <h2>Student Performance</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={performanceData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={100}
-                  fill="#8884d8"
-                >
-                  {performanceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-            <p>October 2023</p>
-          </div>
-
-          {/* Personalized Suggestions */}
-          <div className="personalized-suggestions">
-            <h2>Personalized Suggestions</h2>
-            <div className="suggestion-card">
-              <h3>Math Score</h3>
-              <p>85</p>
-              <p style={{ color: 'green' }}>▲ 85%</p>
-            </div>
-          </div>
-        </section>
-
-        
-
-        {/* Performance Trend Analysis */}
-        <section className="performance-trends">
-          <h2>Performance Trend Analysis</h2>
-          <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={clicksData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
-                          <YAxis />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="clicks" stroke="#8884d8" />
-                        </LineChart>
-                      </ResponsiveContainer>
-        </section>
-      </main>
-    </div>
-  );
-};
-
 export default DashboardPage;
-

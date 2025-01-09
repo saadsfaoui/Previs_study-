@@ -12,6 +12,7 @@ import SubjectsPage from './pages/Student/SubjectsPage';
 import PredictionsPage from './pages/Student/PredictionsPage';
 import GroupsPage from './pages/Student/GroupsPage';
 import './index.css';
+import UserList from './pages/Admin/UserList';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/userlist" element={<UserList />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/group" element={<GroupPage />} />
         <Route path="/requests" element={<RequestPage />} />
