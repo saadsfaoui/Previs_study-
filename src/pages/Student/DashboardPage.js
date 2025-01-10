@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import API from '../../services/api';
 import './DashboardPage.css';
+import userIcon from '../../images/1077114.png';
 
 const DashboardPage = () => {
+  const [userData, setUserData] = useState(null); // Nouveau : Données utilisateur
   const [subjectsProportion, setSubjectsProportion] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
   const [averageScore, setAverageScore] = useState(null);
@@ -33,8 +23,7 @@ const DashboardPage = () => {
 
     return Object.values(groupedData).map((group) => ({
       date: group.date,
-      average_score:
-        group.scores.reduce((a, b) => a + b, 0) / group.scores.length,
+      average_score: group.scores.reduce((a, b) => a + b, 0) / group.scores.length,
     }));
   };
 
@@ -42,18 +31,15 @@ const DashboardPage = () => {
     const fetchDashboardData = async () => {
       try {
         const response = await API.get('/dashboard');
-        const { overall_performance, subjects_proportion } = response.data;
+        const { user, overall_performance, subjects_proportion } = response.data;
 
-        const performanceData = transformPerformanceData(
-          overall_performance.performance_over_time
-        );
+        const performanceData = transformPerformanceData(overall_performance.performance_over_time);
 
-        setSubjectsProportion(
-          subjects_proportion.map((subject) => ({
-            name: subject.name,
-            average_score: Number(subject.average_score),
-          }))
-        );
+        setUserData(user); // Nouveau : Stocker les données utilisateur
+        setSubjectsProportion(subjects_proportion.map(subject => ({
+          name: subject.name,
+          average_score: Number(subject.average_score),
+        })));
         setPerformanceData(performanceData);
         setAverageScore(overall_performance.average_score || null);
       } catch (error) {
@@ -68,6 +54,21 @@ const DashboardPage = () => {
     <div>
       <Header />
       <main className="container">
+        {/* Informations utilisateur */}
+        {userData && (
+          <div className="user-info">
+            <img
+              src={userIcon} // Avatar utilisateur ou placeholder
+              alt="User Icon"
+              className="user-avatar"
+            />
+            <div className="user-details">
+              <h3>{userData.name}</h3>
+              <p>Average Score: {averageScore !== null ? Number(averageScore).toFixed(2) : 'N/A'}</p>
+            </div>
+          </div>
+        )}
+
         {/* Pie Chart : Moyenne des scores par matière */}
         <section className="dashboard-section">
           <div className="performance-scores">
@@ -81,16 +82,12 @@ const DashboardPage = () => {
                     nameKey="name"
                     outerRadius={100}
                     fill="#8884d8"
-                    label={({ name, percent }) =>
-                      `${name} (${(percent * 100).toFixed(0)}%)`
-                    }
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   >
                     {subjectsProportion.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={`#${Math.floor(Math.random() * 16777215).toString(
-                          16
-                        )}`}
+                        fill={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
                       />
                     ))}
                   </Pie>
@@ -100,15 +97,6 @@ const DashboardPage = () => {
                 <p>No data available for Subjects Proportion.</p>
               )}
             </ResponsiveContainer>
-          </div>
-
-          <div className="average-score">
-            <h3>Average Score</h3>
-            <p>
-              {averageScore !== null
-                ? Number(averageScore).toFixed(2)
-                : 'N/A'}
-            </p>
           </div>
         </section>
 
@@ -121,11 +109,7 @@ const DashboardPage = () => {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="average_score"
-                stroke="#8884d8"
-              />
+              <Line type="monotone" dataKey="average_score" stroke="#8884d8" />
             </LineChart>
           </ResponsiveContainer>
         </section>
