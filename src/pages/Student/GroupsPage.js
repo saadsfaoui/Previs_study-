@@ -9,6 +9,7 @@ const GroupsPage = () => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [recommendedGroups, setRecommendedGroups] = useState([]);
   const [sharedResources, setSharedResources] = useState([]);
+  const [approvedRequests, setApprovedRequests] = useState([]); // État pour stocker les requêtes approuvées
 
   // Charger les données pour les groupes et les ressources
   useEffect(() => {
@@ -26,6 +27,10 @@ const GroupsPage = () => {
         // Lister les ressources partagées
         const sharedResourcesResponse = await API.get('/groups/resources');
         setSharedResources(sharedResourcesResponse.data);
+
+        // Récupérer les requêtes approuvées
+        const approvedRequestsResponse = await API.get('/requests/approved');
+        setApprovedRequests(approvedRequestsResponse.data.map((req) => req.group_id));
       } catch (err) {
         console.error('Erreur lors du chargement des groupes et des ressources:', err);
       }
@@ -40,6 +45,28 @@ const GroupsPage = () => {
       group.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredGroups(filtered);
+  };
+
+  // Demander à rejoindre un groupe
+  const handleRequestJoin = async (groupId) => {
+    try {
+      await API.post('/requests', { group_id: groupId });
+      alert('Request sent successfully. Waiting for approval.');
+    } catch (err) {
+      console.error('Error sending request to join group:', err);
+      alert(err.response?.data.message || 'An error occurred.');
+    }
+  };
+
+  // Rejoindre un groupe directement
+  const handleJoinGroup = async (groupId) => {
+    try {
+      await API.post(`/groups/join/${groupId}`);
+      alert('Successfully joined the group!');
+    } catch (err) {
+      console.error('Error joining group:', err);
+      alert(err.response?.data.message || 'An error occurred.');
+    }
   };
 
   return (
@@ -82,13 +109,31 @@ const GroupsPage = () => {
         <section className="recommended-groups">
           <h2>Recommended Groups</h2>
           <div className="group-list">
-            {recommendedGroups.map((group, index) => (
-              <div key={index} className="group-card">
-                <h3>{group.name}</h3>
-                <p>{group.description}</p>
-                <button className="btn join">Join</button>
-              </div>
-            ))}
+            {recommendedGroups.length > 0 ? (
+              recommendedGroups.map((group, index) => (
+                <div key={index} className="group-card">
+                  <h3>{group.name}</h3>
+                  <p>{group.description}</p>
+                  {!approvedRequests.includes(group.id) ? (
+                    <button
+                      className="btn request"
+                      onClick={() => handleRequestJoin(group.id)}
+                    >
+                      Request to Join
+                    </button>
+                  ) : (
+                    <button
+                      className="btn join"
+                      onClick={() => handleJoinGroup(group.id)}
+                    >
+                      Join
+                    </button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No recommended groups found.</p>
+            )}
           </div>
         </section>
 
