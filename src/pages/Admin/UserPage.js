@@ -94,7 +94,7 @@ const UserPage = () => {
           <h1 className="text-2xl font-bold mb-4">User Information</h1>
           {/* Graphique en cercle */}
           <div className="flex justify-center mb-6">
-            <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg w-64">
+            <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg w-full max-w-xs">
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 Registered Users
               </h3>
@@ -103,7 +103,6 @@ const UserPage = () => {
                 <span className="text-2xl font-bold text-gray-900">
                   {users.length}
                 </span>
-
               </div>
             </div>
           </div>
@@ -121,75 +120,61 @@ const UserPage = () => {
 
           {/* Tableau des utilisateurs */}
           <div className="bg-white shadow-lg p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Existing Users</h2>
+            <h2 className="text-xl font-bold mb-4 text-blue-600">
+              Existing Users
+            </h2>
             {loading ? (
-              <p>Chargement des utilisateurs...</p>
+              <p>Loading users...</p>
             ) : (
-              <table className="w-full border-collapse bg-white shadow rounded-lg">
-                <thead>
-                  <tr>
-                    <th className="border-b py-2 px-4 text-left">Username</th>
-                    <th className="border-b py-2 px-4 text-left">Email</th>
-                    <th className="border-b py-2 px-4 text-left">Date Added</th>
-                    <th className="border-b py-2 px-4 text-left">Status</th>
-                    <th className="border-b py-2 px-4 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td className="border-b py-2 px-4">{user.name}</td>
-                      <td className="border-b py-2 px-4">{user.email}</td>
-                      <td className="border-b py-2 px-4">{user.created_at}</td>
-                      <td className="border-b py-2 px-4">
-                        {user.is_blocked ? (
-                          <span className="text-red-500 font-bold">
-                            Blocked
-                          </span>
-                        ) : (
-                          <span className="text-green-500 font-bold">
-                            Active
-                          </span>
-                        )}
-                      </td>
-                      <td className="border-b py-2 px-4">
-                        <button
-                          className="text-white px-4 py-2 rounded"
-                          style={{
-                            backgroundColor: '#6366F1',
-                            transition: 'background-color 0.3s',
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.target.style.backgroundColor = '#4F46E5')
-                          }
-                          onMouseLeave={(e) =>
-                            (e.target.style.backgroundColor = '#6366F1')
-                          }
-                          onClick={() => handleBlockUser(user.id)}
-                        >
-                          Block
-                        </button>
-                        <button
-                          className="ml-2 text-white px-4 py-2 rounded"
-                          style={{
-                            backgroundColor: '#10B981',
-                            transition: 'background-color 0.3s',
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.target.style.backgroundColor = '#059669')
-                          }
-                          onMouseLeave={(e) =>
-                            (e.target.style.backgroundColor = '#10B981')
-                          }
-                          onClick={() => handleUnblockUser(user.id)}
-                        >
-                          Unblock
-                        </button>
-                      </td>
+              <div className="overflow-auto"> {/* Conteneur avec overflow pour le tableau */}
+                <table className="w-full border-collapse bg-white shadow rounded-lg min-w-[600px]">
+                  <thead>
+                    <tr>
+                      <th className="border-b py-2 px-4 text-left">Username</th>
+                      <th className="border-b py-2 px-4 text-left">Email</th>
+                      <th className="border-b py-2 px-4 text-left">Date Added</th>
+                      <th className="border-b py-2 px-4 text-left">Status</th>
+                      <th className="border-b py-2 px-4 text-left">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="hover:bg-gray-50">
+                        <td className="border-b py-2 px-4">{user.name}</td>
+                        <td className="border-b py-2 px-4">{user.email}</td>
+                        <td className="border-b py-2 px-4">
+                          {new Date(user.created_at).toLocaleString()}
+                        </td>
+                        <td className="border-b py-2 px-4">
+                          {user.is_blocked ? (
+                            <span className="text-red-500 font-bold">
+                              Blocked
+                            </span>
+                          ) : (
+                            <span className="text-green-500 font-bold">
+                              Active
+                            </span>
+                          )}
+                        </td>
+                        <td className="border-b py-2 px-4 text-center">
+                          <button
+                            className="text-white px-4 py-2 rounded bg-indigo-500 hover:bg-indigo-600 transition-colors"
+                            onClick={() => handleBlockUser(user.id)}
+                          >
+                            Block
+                          </button>
+                          <button
+                            className="ml-2 text-white px-4 py-2 rounded bg-green-500 hover:bg-green-600 transition-colors"
+                            onClick={() => handleUnblockUser(user.id)}
+                          >
+                            Unblock
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>

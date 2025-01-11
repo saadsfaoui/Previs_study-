@@ -1,132 +1,159 @@
-/* Styles pour le header */
 .headers {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid #eaeaea;
-    height: 60px;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .logo-circle {
-    width: 25px;
-    height: 25px;
-    background: linear-gradient(135deg, #6200ea, #b388ff);
-    border-radius: 50%;
-  }
-  
-  .logo h1 {
-    font-size: 1.2rem;
-    color: #333;
-    font-weight: bold;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #eaeaea;
+  position: relative;
+  z-index: 50;
+}
+
+.header-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-circle {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #6200ea, #b388ff);
+  border-radius: 50%;
+}
+
+.logo h1 {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  transition: transform 0.3s ease;
+}
+
+.nav-links.open {
+  transform: translateX(0);
+}
+
+.nav-item {
+  text-decoration: none;
+  font-size: 1rem;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+.nav-item.active {
+  color: #6200ea;
+  font-weight: bold;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logout-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+.profile-icon {
+  width: 30px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+
+.profile-icon::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+.profile-icon::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  width: 18px;
+  height: 8px;
+  background-color: #fff;
+  border-radius: 50% / 100% 100% 0 0;
+}
+
+/* Styles pour le menu hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.hamburger .line {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  transition: transform 0.3s ease;
+}
+
+.hamburger .line.open:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger .line.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger .line.open:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
   .nav-links {
-    display: flex;
-    gap: 2rem;
-    
-  }
-  
-  /*.nav-item {
-    text-decoration: none;
-    font-size: 1rem;
-    color: #555;
-    padding: 0.5rem 0;
-    position: relative;
-  }*/
-  
-  .nav-item.active {
-    color: #6200ea;
-    font-weight: bold;
-  }
-  
-  .nav-item.active::after {
-    content: '';
+    flex-direction: column;
     position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 2px;
-    background-color: #6200ea;
-  }
-  
-  .search-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  
-  .search-box input {
-   
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
-    width: 600px;
-    font-size: 1rem;
-    outline: none;
-    background-color: #e6e6e6;
-  }
-  
-  .search-icon {
-    position: absolute;
-    right: 10px;
-    color: #aaa;
-    pointer-events: none;
-    font-size: 1rem;
-  }
-  
-  .profile-icon {
-    width: 30px;
-    height: 30px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .profile-icon::before {
-    content: '';
-    position: absolute;
-    top: 6px;
-    left: 8px;
-    width: 14px;
-    height: 14px;
+    top: 60px;
+    right: 0;
     background-color: #fff;
-    border-radius: 50%;
-  }
-  
-  .profile-icon::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 6px;
-    width: 18px;
-    height: 8px;
-    background-color: #fff;
-    border-radius: 50% / 100% 100% 0 0;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
   }
 
-  
-  
-  .nav-item {
-    text-decoration: none;
-    font-size: 1rem;
-    color: #555;
-    padding: 0.5rem 0;
-    position: relative;
-    transition: color 0.3s ease;
+  .nav-links.open {
+    transform: translateX(0);
   }
-  
- 
-  
-  
-  
-  
-  
+
+  .hamburger {
+    display: flex;
+  }
+}

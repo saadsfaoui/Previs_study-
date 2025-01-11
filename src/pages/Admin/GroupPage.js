@@ -2,32 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import AdminHeader from '../../components/AdminHeader';
-import API from '../../services/api'; // Importez votre instance Axios
+import API from '../../services/api';
 
-// Enregistrer les composants nécessaires
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const GroupPage = () => {
-  // États pour gérer les groupes
-  const [groups, setGroups] = useState([]); // Liste des groupes
-  const [filteredGroups, setFilteredGroups] = useState([]); // Liste des groupes filtrés pour la recherche
-  const [loading, setLoading] = useState(true); // Indique si les données sont en cours de chargement
-  const [searchQuery, setSearchQuery] = useState(''); // Texte de recherche
-
-  // États pour le formulaire d'ajout/modification
+  const [groups, setGroups] = useState([]);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
   const [groupResource, setGroupResource] = useState('');
   const [resourceList, setResourceList] = useState([]);
   const [editGroupId, setEditGroupId] = useState(null);
 
-  // Charger les groupes depuis le backend
   const fetchGroups = async () => {
     try {
-      const response = await API.get('/groups'); // Appel API
-      setGroups(response.data); // Mettre à jour les groupes
-      setFilteredGroups(response.data); // Initialiser les groupes filtrés
-      setLoading(false); // Arrêter le chargement
+      const response = await API.get('/groups');
+      setGroups(response.data);
+      setFilteredGroups(response.data);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching groups:', error);
       alert('Erreur lors du chargement des groupes.');
@@ -35,23 +30,19 @@ const GroupPage = () => {
     }
   };
 
-  // Charger les groupes au montage du composant
   useEffect(() => {
     fetchGroups();
   }, []);
 
-  // Gérer la recherche
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
     const filtered = groups.filter((group) =>
       group.name.toLowerCase().includes(query)
     );
     setFilteredGroups(filtered);
   };
 
-  // Ajouter ou modifier un groupe
   const handleAddOrEditGroup = async (e) => {
     e.preventDefault();
 
@@ -60,7 +51,7 @@ const GroupPage = () => {
         const groupData = {
           name: groupName,
           description: groupDescription,
-          links: resourceList, // Inclure la liste des ressources actuelles
+          links: resourceList,
         };
 
         if (editGroupId) {
@@ -80,13 +71,12 @@ const GroupPage = () => {
     }
   };
 
-  // Supprimer un groupe
   const handleDeleteGroup = async (id) => {
     if (window.confirm('Voulez-vous vraiment supprimer ce groupe ?')) {
       try {
         await API.delete(`/groups/${id}`);
         alert('Groupe supprimé avec succès');
-        fetchGroups(); // Rafraîchir les groupes
+        fetchGroups();
       } catch (error) {
         console.error('Error deleting group:', error);
         alert('Erreur lors de la suppression du groupe.');
@@ -94,7 +84,6 @@ const GroupPage = () => {
     }
   };
 
-  // Réinitialiser le formulaire
   const resetForm = () => {
     setGroupName('');
     setGroupDescription('');
@@ -103,34 +92,30 @@ const GroupPage = () => {
     setEditGroupId(null);
   };
 
-  // Pré-remplir le formulaire pour la modification
   const handleEditGroup = (group) => {
     setGroupName(group.name);
     setGroupDescription(group.description);
-    setResourceList(group.links || []); // Charger les liens existants dans la liste des ressources
-    setGroupResource(''); // Réinitialiser le champ d'ajout de lien
+    setResourceList(group.links || []);
+    setGroupResource('');
     setEditGroupId(group.id);
   };
 
-  // Ajouter une ressource au tableau de ressources
   const handleAddResource = () => {
     if (groupResource.trim() !== '') {
       setResourceList([...resourceList, groupResource.trim()]);
-      setGroupResource(''); // Réinitialiser le champ d'ajout
+      setGroupResource('');
     }
   };
 
-  // Supprimer un lien de la liste des ressources
   const handleRemoveResource = (index) => {
     setResourceList(resourceList.filter((_, i) => i !== index));
   };
 
-  // Données pour le graphique Doughnut
   const groupChartData = {
     labels: ['Groups Created', 'Inactive Groups'],
     datasets: [
       {
-        data: [groups.length, 0], // Exemple : Nombre de groupes actifs
+        data: [groups.length, 0],
         backgroundColor: ['#6366F1', '#E5E7EB'],
         hoverBackgroundColor: ['#4F46E5', '#D1D5DB'],
         borderWidth: 1,
@@ -144,8 +129,7 @@ const GroupPage = () => {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (tooltipItem) =>
-            `${tooltipItem.label}: ${tooltipItem.raw}`,
+          label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw}`,
         },
       },
     },
@@ -158,7 +142,6 @@ const GroupPage = () => {
       <main className="container mx-auto px-6">
         <h1 className="text-2xl font-bold mb-4">Groups</h1>
 
-        {/* Section du graphique */}
         <div className="flex justify-center items-center mb-6">
           <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md w-64">
             <h3 className="text-sm font-medium text-gray-500 mb-2">Created Groups</h3>
@@ -170,7 +153,6 @@ const GroupPage = () => {
           </div>
         </div>
 
-        {/* Formulaire pour créer ou modifier un groupe */}
         <div className="bg-white shadow-md p-6 rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">
             {editGroupId ? 'Edit Group' : 'Create a New Group'}
@@ -193,7 +175,6 @@ const GroupPage = () => {
               required
             ></textarea>
 
-            {/* Ajouter un lien */}
             <div className="flex gap-2 items-center">
               <input
                 type="text"
@@ -211,7 +192,6 @@ const GroupPage = () => {
               </button>
             </div>
 
-            {/* Liens existants */}
             <ul className="list-disc ml-6 mt-4">
               {resourceList.map((resource, index) => (
                 <li key={index} className="flex items-center justify-between">
@@ -236,7 +216,6 @@ const GroupPage = () => {
           </form>
         </div>
 
-        {/* Zone de recherche */}
         <div className="mb-6">
           <input
             type="text"
@@ -247,64 +226,70 @@ const GroupPage = () => {
           />
         </div>
 
-        {/* Tableau des groupes */}
         <div className="bg-white shadow-lg p-6 rounded-lg">
-          <h2 className="text-xl font-bold mb-4">Existing Groups</h2>
-          {loading ? (
-            <p>Chargement des groupes...</p>
-          ) : (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="border-b py-2 px-4 text-left">Group ID</th>
-                  <th className="border-b py-2 px-4 text-left">Group Name</th>
-                  <th className="border-b py-2 px-4 text-left">Description</th>
-                  <th className="border-b py-2 px-4 text-left">Links</th>
-                  <th className="border-b py-2 px-4 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredGroups.map((group) => (
-                  <tr key={group.id}>
-                    <td className="border-b py-2 px-4">{group.id}</td>
-                    <td className="border-b py-2 px-4">{group.name}</td>
-                    <td className="border-b py-2 px-4">{group.description}</td>
-                    <td className="border-b py-2 px-4">
-                      <ul>
-                        {group.links?.map((link, index) => (
-                          <li key={index}>
-                            <a
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline"
-                            >
-                              {link}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="border-b py-2 px-4 flex space-x-2">
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        onClick={() => handleEditGroup(group)}
+  <h2 className="text-xl font-bold mb-4">Existing Groups</h2>
+  {loading ? (
+    <p>Loading groups...</p>
+  ) : filteredGroups.length > 0 ? (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse min-w-[600px]">
+        <thead>
+          <tr>
+            <th className="border-b py-2 px-4 text-left">Group ID</th>
+            <th className="border-b py-2 px-4 text-left">Group Name</th>
+            <th className="border-b py-2 px-4 text-left">Description</th>
+            <th className="border-b py-2 px-4 text-left">Links</th>
+            <th className="border-b py-2 px-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredGroups.map((group) => (
+            <tr key={group.id}>
+              <td className="border-b py-2 px-4">{group.id}</td>
+              <td className="border-b py-2 px-4">{group.name}</td>
+              <td className="border-b py-2 px-4">{group.description}</td>
+              <td className="border-b py-2 px-4">
+                <ul>
+                  {group.links?.map((link, index) => (
+                    <li key={index}>
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline break-all"
                       >
-                        Edit
-                      </button>
-                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                        onClick={() => handleDeleteGroup(group.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </td>
+              <td className="border-b py-2 px-4">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    onClick={() => handleEditGroup(group)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    onClick={() => handleDeleteGroup(group.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p>No groups available.</p>
+  )}
+</div>
+
       </main>
     </div>
   );

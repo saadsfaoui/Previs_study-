@@ -40,7 +40,7 @@ const Footer = () => {
       <div className="mx-auto">
         {/* Contact Form */}
         <div id="contact" className="text-center mb-10">
-          <h2 className="text-xl font-bold mb-4">Contact Us</h2>
+          <h2 className="text-xl font-bold mb-4 text-blue-500">Contact Us</h2>
           {successMessage && (
             <p className="text-green-500 mb-4">{successMessage}</p>
           )}

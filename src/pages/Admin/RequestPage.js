@@ -10,13 +10,13 @@ const RequestPage = () => {
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState(''); // État pour le filtre par état
+  const [filterStatus, setFilterStatus] = useState('');
 
   const fetchRequests = async () => {
     try {
       const response = await API.get('/requests');
       setRequests(response.data);
-      setFilteredRequests(response.data); // Initialiser les demandes filtrées
+      setFilteredRequests(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -65,7 +65,7 @@ const RequestPage = () => {
     setFilterStatus(selectedStatus);
 
     if (selectedStatus === '') {
-      setFilteredRequests(requests); // Afficher toutes les demandes si aucun filtre
+      setFilteredRequests(requests);
     } else {
       const filtered = requests.filter((request) => request.status === selectedStatus);
       setFilteredRequests(filtered);
@@ -135,7 +135,6 @@ const RequestPage = () => {
           </div>
         </div>
 
-        {/* Zone de filtre par état */}
         <div className="mb-6">
           <label htmlFor="filterStatus" className="block text-sm font-medium text-gray-700 mb-2">
             Filter by Status
@@ -153,7 +152,7 @@ const RequestPage = () => {
           </select>
         </div>
 
-        <div className="bg-white shadow-lg p-6 rounded-lg">
+        <div className="bg-white shadow-lg p-6 rounded-lg overflow-auto">
           <h2 className="text-xl font-bold mb-4">Request List</h2>
           {loading ? (
             <p>Chargement des demandes...</p>
@@ -187,26 +186,29 @@ const RequestPage = () => {
                         {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                       </span>
                     </td>
-                    <td className="border-b py-2 px-4 flex space-x-2">
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        onClick={() => handleApprove(request.id)}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                        onClick={() => handleReject(request.id)}
-                      >
-                        Reject
-                      </button>
-                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                        onClick={() => handleDelete(request.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
+                    <td className="border-b py-2 px-4 text-center">
+  <div className="flex flex-col items-center justify-center space-y-2">
+    <button
+      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      onClick={() => handleApprove(request.id)}
+    >
+      Approve
+    </button>
+    <button
+      className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+      onClick={() => handleReject(request.id)}
+    >
+      Reject
+    </button>
+    <button
+      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      onClick={() => handleDelete(request.id)}
+    >
+      Delete
+    </button>
+  </div>
+</td>
+
                   </tr>
                 ))}
               </tbody>
