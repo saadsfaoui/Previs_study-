@@ -21,19 +21,27 @@ const Footer = () => {
     e.preventDefault();
     setSuccessMessage(null);
     setErrorMessage(null);
-
+  
     try {
-      // Envoyer les données au backend
       await API.post('/contact', formData);
-
-      // Afficher un message de succès et réinitialiser le formulaire
+  
       setSuccessMessage('Votre message a été envoyé avec succès !');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
       console.error('Erreur lors de l\'envoi du message:', error.response || error);
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+  
+      if (error.response && error.response.status === 422) {
+        // Afficher les erreurs de validation
+        const validationErrors = Object.values(error.response.data.errors)
+          .flat()
+          .join(', ');
+        setErrorMessage(validationErrors);
+      } else {
+        setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+      }
     }
   };
+  
 
   return (
     <footer className="bg-gray-800 py-10 px-6 text-white">
@@ -97,7 +105,7 @@ const Footer = () => {
         {/* Bottom Links */}
         <div className="text-center border-t border-gray-600 pt-4">
           <p className="text-sm text-gray-300">
-            © 2024 Innovative Platform. All rights reserved. ·{' '}
+            © 2025 Innovative Platform. All rights reserved. ·{' '}
             <a href="#privacy" className="hover:text-blue-500">Privacy</a> ·{' '}
             <a href="#terms" className="hover:text-blue-500">Terms</a>
           </p>

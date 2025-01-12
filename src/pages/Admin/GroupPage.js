@@ -267,7 +267,7 @@ const GroupPage = () => {
               <td className="border-b py-2 px-4">
                 <div className="flex flex-col items-center justify-center gap-2">
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className=" bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
                     onClick={() => handleEditGroup(group)}
                   >
                     Edit

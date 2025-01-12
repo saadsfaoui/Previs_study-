@@ -120,7 +120,7 @@ const UserPage = () => {
 
           {/* Tableau des utilisateurs */}
           <div className="bg-white shadow-lg p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4 text-blue-600">
+            <h2 className="text-xl font-bold mb-4">
               Existing Users
             </h2>
             {loading ? (

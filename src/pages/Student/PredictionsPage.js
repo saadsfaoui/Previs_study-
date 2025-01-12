@@ -62,7 +62,7 @@ const PredictionsPage = () => {
             <BarChart data={quarterlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis domain={[0, 100]} />
+              <YAxis domain={[0,20]} />
               <Tooltip />
               {quarterlyData.length > 0 &&
                 Object.keys(quarterlyData[0])
@@ -85,7 +85,7 @@ const PredictionsPage = () => {
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" /> {/* Affiche le mois (YYYY-MM) */}
-              <YAxis domain={[0, 100]} />
+              <YAxis domain={[0, 20]} />
               <Tooltip />
               <Line type="monotone" dataKey="average_score" stroke="#8884d8" />
             </LineChart>
